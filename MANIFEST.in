@@ -1,0 +1,4 @@
+include LICENSE
+include README.md
+recursive-include craigsbot *.py *.txt *.html
+recursive-exclude tests *

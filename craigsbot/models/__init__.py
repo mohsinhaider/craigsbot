@@ -1,0 +1,1 @@
+from craigsbot.models.posting import Posting

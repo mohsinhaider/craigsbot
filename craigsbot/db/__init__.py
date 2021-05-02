@@ -1,0 +1,1 @@
+from craigsbot.db.connect import initialize_database
