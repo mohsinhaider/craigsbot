@@ -1,4 +1,6 @@
-import requests
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 from craigsbot.parser import (
     CraigslistPostingParser,
@@ -8,34 +10,31 @@ from craigsbot.parser import (
 
 class CraigslistClient:
     @staticmethod
-    def get_all_search_results_page_urls(base_url: str) -> str:
-        search_results_url = base_url
-        search_results_urls = [search_results_url]
-
-        while True:
-            content = CraigslistClient.get_content(search_results_url)
-            parser = CraigslistSearchResultsParser(content)
-            search_results_url = parser.get_next_search_results_url()
-            if not search_results_url:
-                break
-
-            search_results_urls.append(search_results_url)
-
-        return search_results_urls
+    def get_page_count(driver, url: str) -> int:
+        source = CraigslistClient.get_search_results_source(driver, url)
+        parser = CraigslistSearchResultsParser(source)
+        return parser.get_page_count()
 
     @staticmethod
-    def get_postings_metadata(url: str) -> list:
-        content = CraigslistClient.get_content(url)
-        parser = CraigslistSearchResultsParser(content)
+    def get_postings_metadata(driver, url: str) -> list:
+        source = CraigslistClient.get_search_results_source(driver, url)
+        parser = CraigslistSearchResultsParser(source)
         return parser.get_postings_metadata()
 
     @staticmethod
-    def get_posting_lat_long(url: str) -> list:
-        content = CraigslistClient.get_content(url)
-        parser = CraigslistPostingParser(content)
+    def get_posting_lat_long(driver, url: str) -> list:
+        source = CraigslistClient.get_posting_source(driver, url)
+        parser = CraigslistPostingParser(source)
         return parser.get_lat_long()
 
     @staticmethod
-    def get_content(url: str) -> str:
-        response = requests.get(url)
-        return response.content.decode("utf-8")
+    def get_search_results_source(driver, url: str):
+        driver.get(url)
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'cl-search-result')))
+        return driver.page_source
+
+    @staticmethod
+    def get_posting_source(driver, url: str):
+        driver.get(url)
+        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
+        return driver.page_source

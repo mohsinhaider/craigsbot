@@ -1,10 +1,11 @@
 from typing import Any
 
-import mongoengine
+from mongoengine import connect
 
 from craigsbot.config import Configuration
 
 
-def initialize_database() -> Any:
-    return mongoengine.connect(db=Configuration.DATABASE_NAME, host=Configuration.DATABASE_HOST,
-                               port=Configuration.DATABASE_PORT)
+def initialize_database():
+    connect(
+        host=f"mongodb+srv://{Configuration.DATABASE_USERNAME}:{Configuration.DATABASE_PASSWORD}@{Configuration.DATABASE_HOST}/{Configuration.DATABASE_NAME}?retryWrites=true&w=majority"
+    )

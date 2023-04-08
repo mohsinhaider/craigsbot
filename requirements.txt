@@ -1,6 +1,8 @@
 beautifulsoup4==4.9.3
 mongoengine==0.23.0
+pymongo[srv]
 python-dotenv==0.17.1
 requests==2.25.1
-Shapely==1.7.1
+selenium==4.8.3
+Shapely==1.8.5
 twilio==6.57.0

@@ -1,3 +1,5 @@
+import math
+
 from bs4 import BeautifulSoup
 
 from craigsbot.exceptions import MissingGeographicDataException
@@ -16,15 +18,23 @@ class CraigslistSearchResultsParser(BeautifulSoup):
         return next_link_tag.get("href")
 
     def get_postings_metadata(self) -> list:
-        metadata = []
-        a_tags = self.find_all("a", {"class": "result-title hdrlnk"})
-        for a_tag in a_tags:
-            metadata.append({
-                "data-id": a_tag["data-id"],
+        ids_and_links = []
+        li_tags = self.find_all(class_="cl-search-result cl-search-view-mode-thumb")
+        for li_tag in li_tags:
+            div_tag = li_tag.findChild("div", {"class": "result-node"})
+            a_tag = div_tag.findChild("a", {"class": "result-thumb"})
+            ids_and_links.append({
+                "data-id": li_tag["data-pid"],
                 "href": a_tag["href"]
             })
+        return ids_and_links
 
-        return metadata
+    def get_page_count(self):
+        page_number = self.find(class_="cl-page-number").text
+        page_number_tokens = page_number.split(" ")
+        results_per_page = page_number_tokens[2]
+        total_results = page_number_tokens[4]
+        return math.ceil(int(total_results) / int(results_per_page))
 
 
 class CraigslistPostingParser(BeautifulSoup):
