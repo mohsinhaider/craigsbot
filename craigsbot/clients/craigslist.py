@@ -36,5 +36,5 @@ class CraigslistClient:
     @staticmethod
     def get_posting_source(driver, url: str):
         driver.get(url)
-        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
+        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
         return driver.page_source

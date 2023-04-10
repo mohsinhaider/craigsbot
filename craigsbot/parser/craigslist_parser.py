@@ -34,6 +34,8 @@ class CraigslistSearchResultsParser(BeautifulSoup):
         page_number_tokens = page_number.split(" ")
         results_per_page = page_number_tokens[2]
         total_results = page_number_tokens[4]
+        if "," in total_results:
+            total_results = total_results.replace(",", "")
         return math.ceil(int(total_results) / int(results_per_page))
 
 
