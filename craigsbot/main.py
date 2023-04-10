@@ -5,6 +5,8 @@ craig_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(craig_path)
 
 import logging
+import random
+import time
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -58,52 +60,66 @@ def process_postings(driver) -> None:
     boundaries = create_boundaries()
     counter = 0
     search_results_url = Configuration.SEARCH_RESULTS_URL
+    failed = []
 
     number_of_pages = CraigslistClient.get_page_count(driver, search_results_url)
     for i in range(number_of_pages):
         if i != 0:
             search_results_url = search_results_url.replace(f"thumb~{i-1}", f"thumb~{i}")
 
-        postings_metadata = CraigslistClient.get_postings_metadata(driver, search_results_url)
+        try:
+            postings_metadata = CraigslistClient.get_postings_metadata(driver, search_results_url)
+        except:
+            failed.append(posting_url)
+            print(f"Failed posting: {posting_url}")
+            continue
 
         for posting_metadata in postings_metadata:
             posting_data_id = posting_metadata["data-id"].strip()
-            try:
-                Posting.objects.get(data_id=posting_data_id)
-                continue
-            except DoesNotExist:
-                posting_url = posting_metadata["href"]
-                logger.info(f"Encountered candidate new posting: {posting_url}")
-
+            # try:
+            #     Posting.objects.get(data_id=posting_data_id)
+            #     continue
+            # except DoesNotExist:
+            #     posting_url = posting_metadata["href"]
+            #     logger.info(f"Encountered candidate new posting: {posting_url}")
+            posting_url = posting_metadata["href"]
             counter += 1
-            lat, long = map(lambda c: float(c), CraigslistClient.get_posting_lat_long(driver, posting_url))
+            print(counter)
+            random_num = random.uniform(0.4, 0.8)
+            time.sleep(random_num)
+
+            try:
+                lat, long = map(lambda c: float(c), CraigslistClient.get_posting_lat_long(driver, posting_url))
+            except:
+                failed.append(posting_url)
+                continue
             for boundary in boundaries:
                 if is_coordinate_in_boundary(lat, long, boundary):
                     sms_message = f"Craigsbot found a new apartment: {posting_url}"
-                    print(f"Encountered posting inside of boundary {posting_url}")
+                    # print(f"Encountered posting inside of boundary {posting_url}")
                     try:
                         print("Sending sms")
+                        file1 = open("/Users/mohsin/Desktop/no-filter.txt", "a")
+                        file1.write(f"{posting_url}\n")
+                        file1.close()
                     except Exception as e:
                         print("Error sending sms")
                         # logger.error("Failed to send message")
                         # raise SMSSendFailureException from e
                     else:
-                        Posting(
-                            data_id=posting_data_id,
-                            url=posting_url,
-                            latitude=lat,
-                            longitude=long,
-                        ).save()
+                        pass
+                        # Posting(
+                        #     data_id=posting_data_id,
+                        #     url=posting_url,
+                        #     latitude=lat,
+                        #     longitude=long,
+                        # ).save()
                 else:
-                    print(f"Encountered posting outside of boundary: {posting_url}")
-                    Posting(
-                        data_id=posting_data_id,
-                        url=posting_url,
-                        latitude=lat,
-                        longitude=long,
-                    ).save()
+                    pass
+                    # print(f"Encountered posting outside of boundary: {posting_url}")
 
     driver.quit()
+    print(f"Failed for {len(failed)} postings. List: {failed}")
     logger.info(f"Found {counter} posts during this run")
 
 
