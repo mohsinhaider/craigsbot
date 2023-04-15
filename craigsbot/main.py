@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 craig_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(craig_path)
@@ -56,12 +57,12 @@ def process_postings(driver) -> None:
     boundaries = create_boundaries()
     counter = 0
     search_results_url = Configuration.SEARCH_RESULTS_URL
-
+    counter = 0
     number_of_pages = CraigslistClient.get_page_count(driver, search_results_url)
     for i in range(number_of_pages):
         if i != 0:
-            # r = random.uniform(50, 70)
-            # time.sleep(r)
+            r = random.uniform(60, 80)
+            time.sleep(r)
             search_results_url = search_results_url.replace(f"thumb~{i-1}", f"thumb~{i}")
 
         postings_metadata = CraigslistClient.get_postings_metadata(driver, search_results_url)
@@ -71,7 +72,11 @@ def process_postings(driver) -> None:
             postings_metadata = CraigslistClient.get_postings_metadata(driver, search_results_url)
 
         for posting_metadata in postings_metadata:
+            print(counter)
+            counter += 1
             posting_data_id = posting_metadata["data-id"].strip()
+            random_num = random.uniform(0.4, 0.7)
+            time.sleep(random_num)
             try:
                 Posting.objects.get(data_id=posting_data_id)
                 continue
@@ -79,7 +84,6 @@ def process_postings(driver) -> None:
                 posting_url = posting_metadata["href"]
                 logger.info(f"Encountered candidate new posting: {posting_url}")
 
-            counter += 1
             lat, long = map(lambda c: float(c), CraigslistClient.get_posting_lat_long(driver, posting_url))
             for boundary in boundaries:
                 if is_coordinate_in_boundary(lat, long, boundary):

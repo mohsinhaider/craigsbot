@@ -31,14 +31,14 @@ class CraigslistClient:
     @staticmethod
     def get_search_results_source(driver, url: str):
         driver.get(url)
-        wait1 = WebDriverWait(driver, 10)
+        wait1 = WebDriverWait(driver, 20)
         wait1.until(EC.invisibility_of_element_located((By.CLASS_NAME, "cl-retrieving")))
-        wait1 = WebDriverWait(driver, 10)
+        wait1 = WebDriverWait(driver, 20)
         wait1.until(EC.presence_of_element_located((By.CLASS_NAME, 'cl-search-result')))
         return driver.page_source
 
     @staticmethod
     def get_posting_source(driver, url: str):
         driver.get(url)
-        WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
+        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
         return driver.page_source
