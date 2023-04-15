@@ -1,3 +1,4 @@
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
@@ -30,7 +31,10 @@ class CraigslistClient:
     @staticmethod
     def get_search_results_source(driver, url: str):
         driver.get(url)
-        WebDriverWait(driver, 3).until(EC.presence_of_element_located((By.CLASS_NAME, 'cl-search-result')))
+        wait1 = WebDriverWait(driver, 10)
+        wait1.until(EC.invisibility_of_element_located((By.CLASS_NAME, "cl-retrieving")))
+        wait1 = WebDriverWait(driver, 10)
+        wait1.until(EC.presence_of_element_located((By.CLASS_NAME, 'cl-search-result')))
         return driver.page_source
 
     @staticmethod
