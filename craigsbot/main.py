@@ -5,6 +5,8 @@ craig_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(craig_path)
 
 import logging
+import random
+import time
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -29,10 +31,6 @@ from selenium.webdriver.chrome.options import Options
 
 logger = logging.getLogger(__name__)
 
-
-# TODO:  Compare results between these two
-# (No hood filters): https://sfbay.craigslist.org/search/sfc/apa?max_bedrooms=4&max_price=6000&min_bedrooms=2&min_price=3500#search=1~thumb~0~0
-# hood filters: https://sfbay.craigslist.org/search/sfc/apa?max_bedrooms=4&max_price=6000&min_bedrooms=2&min_price=3500&nh=12&nh=17&nh=18#search=1~thumb~0~0
 
 def start_application() -> None:
     initialize_database()
@@ -62,9 +60,15 @@ def process_postings(driver) -> None:
     number_of_pages = CraigslistClient.get_page_count(driver, search_results_url)
     for i in range(number_of_pages):
         if i != 0:
+            # r = random.uniform(50, 70)
+            # time.sleep(r)
             search_results_url = search_results_url.replace(f"thumb~{i-1}", f"thumb~{i}")
 
         postings_metadata = CraigslistClient.get_postings_metadata(driver, search_results_url)
+        if len(postings_metadata) == 0:
+            # Craigslist isn't returning results to sleep for 3 minutes and then try again
+            time.sleep(180)
+            postings_metadata = CraigslistClient.get_postings_metadata(driver, search_results_url)
 
         for posting_metadata in postings_metadata:
             posting_data_id = posting_metadata["data-id"].strip()
@@ -95,18 +99,11 @@ def process_postings(driver) -> None:
                             longitude=long,
                         ).save()
                 else:
-                    print(f"Encountered posting outside of boundary: {posting_url}")
-                    Posting(
-                        data_id=posting_data_id,
-                        url=posting_url,
-                        latitude=lat,
-                        longitude=long,
-                    ).save()
+                    logger.info(f"Encountered posting outside of boundary: {posting_url}")
 
     driver.quit()
     logger.info(f"Found {counter} posts during this run")
 
 
 if __name__ == "__main__":
-    print("in here")
     start_application()
