@@ -43,6 +43,8 @@ def setup_selenium():
     driver_path = Configuration.CHROMEDRIVER_PATH
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    # Comment out below on server
+    # chrome_options.add_argument("--no-sandbox")
 
     # Create a new Chrome driver
     driver = webdriver.Chrome(

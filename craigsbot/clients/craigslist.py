@@ -43,8 +43,9 @@ class CraigslistClient:
     def get_posting_source(driver, url: str):
         driver.get(url)
         try:
-            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
+            WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
         except TimeoutException:
             time.sleep(10)
             driver.get(url)
+            WebDriverWait(driver, 120).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
         return driver.page_source
