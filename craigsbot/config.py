@@ -9,6 +9,7 @@ class Configuration:
     DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD")
 
     CHROMEDRIVER_PATH = os.environ["CHROMEDRIVER_PATH"]
+    RESULTS_FILE_PATH = os.environ["RESULTS_FILE_PATH"]
     SEARCH_RESULTS_URL = os.environ["SEARCH_RESULTS_URL"]
 
     # TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")

@@ -1,4 +1,6 @@
+import datetime
 import os
+import pytz
 import sys
 import time
 
@@ -31,6 +33,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 logger = logging.getLogger(__name__)
+timezone = pytz.timezone('US/Pacific')
 
 
 def start_application() -> None:
@@ -93,6 +96,12 @@ def process_postings(driver) -> None:
                     print(f"Encountered posting inside of boundary {posting_url}")
                     try:
                         print("Sending sms")
+                        now = datetime.datetime.now(timezone)
+                        regular_time = now.strftime("%I:%M%p")
+                        date = now.date()
+                        file1 = open(f"{Configuration.RESULTS_FILE_PATH}/{regular_time}-{date}.txt", "a")
+                        file1.write(f"{counter} {posting_url}\n")
+                        file1.close()
                     except Exception as e:
                         print("Error sending sms")
                         # logger.error("Failed to send message")
