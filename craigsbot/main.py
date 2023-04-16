@@ -23,12 +23,12 @@ from craigsbot.boundary import (
 from craigsbot.clients import CraigslistClient
 from craigsbot.config import Configuration
 from craigsbot.db import initialize_database
-# from craigsbot.exceptions import SMSSendFailureException
+from craigsbot.exceptions import SMSSendFailureException
 from craigsbot.models import Posting
-# from craigsbot.sms import (
-#     create_sms_client,
-#     send_sms_message,
-# )
+from craigsbot.sms import (
+    create_sms_client,
+    send_sms_message,
+)
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -38,8 +38,9 @@ timezone = pytz.timezone('US/Pacific')
 
 def start_application() -> None:
     initialize_database()
+    sms_client = create_sms_client()
     driver = setup_selenium()
-    process_postings(driver)
+    process_postings(driver, sms_client)
 
 
 def setup_selenium():
@@ -58,7 +59,7 @@ def setup_selenium():
     return driver
 
 
-def process_postings(driver) -> None:
+def process_postings(driver, sms_client) -> None:
     boundaries = create_boundaries()
     counter = 0
     search_results_url = Configuration.SEARCH_RESULTS_URL
@@ -112,9 +113,11 @@ def process_postings(driver) -> None:
                     print(f"Encountered posting inside of boundary {posting_url}")
                     try:
                         print("Sending sms")
+                        send_sms_message(Configuration.TWILIO_TO_PHONE_NUMBER, sms_message, sms_client)
                         file1.write(f"{counter} {posting_url}\n")
                     except Exception as e:
                         print("Error sending sms")
+                        file1.write(f"Error when sending SMS: {str(e)}\n")
                         # logger.error("Failed to send message")
                         # raise SMSSendFailureException from e
                     else:
