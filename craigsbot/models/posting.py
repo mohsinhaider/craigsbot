@@ -3,6 +3,7 @@ from mongoengine import (
     FloatField,
     StringField,
     URLField,
+    BooleanField,
 )
 
 
@@ -13,3 +14,4 @@ class Posting(Document):
     url = URLField(required=True)
     latitude = FloatField()
     longitude = FloatField()
+    is_in_boundary = BooleanField(required=True)
