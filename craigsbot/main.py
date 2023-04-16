@@ -61,7 +61,7 @@ def process_postings(driver) -> None:
     number_of_pages = CraigslistClient.get_page_count(driver, search_results_url)
     for i in range(number_of_pages):
         if i != 0:
-            r = random.uniform(60, 80)
+            r = random.uniform(100, 120)
             time.sleep(r)
             search_results_url = search_results_url.replace(f"thumb~{i-1}", f"thumb~{i}")
 
@@ -75,7 +75,7 @@ def process_postings(driver) -> None:
             print(counter)
             counter += 1
             posting_data_id = posting_metadata["data-id"].strip()
-            random_num = random.uniform(0.4, 0.7)
+            random_num = random.uniform(0.6, 0.9)
             time.sleep(random_num)
             try:
                 Posting.objects.get(data_id=posting_data_id)

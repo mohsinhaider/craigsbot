@@ -1,3 +1,5 @@
+import time
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -40,5 +42,9 @@ class CraigslistClient:
     @staticmethod
     def get_posting_source(driver, url: str):
         driver.get(url)
-        WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
+        try:
+            WebDriverWait(driver, 60).until(EC.presence_of_element_located((By.CLASS_NAME, 'postingtitle')))
+        except TimeoutException:
+            time.sleep(10)
+            driver.get(url)
         return driver.page_source
