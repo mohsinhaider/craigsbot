@@ -116,7 +116,10 @@ def process_postings(driver, sms_client) -> None:
                     print(f"Encountered posting inside of boundary {posting_url}")
                     try:
                         print("Sending sms")
-                        send_sms_message(Configuration.TWILIO_TO_PHONE_NUMBER, sms_message, sms_client)
+                        phrases = ["Life is a journey, enjoy the ride.", "Success is a journey, not a destination.", "Hard work pays off in the end.", "Keep moving forward, one step at a time.", "Life is too short to waste time on negativity.", "Believe in yourself and anything is possible.", "Dream big, work hard, stay focused.", "Failure is not final, it's a stepping stone.", "Your only limit is the one you set for yourself.", "Don't let fear hold you back from success.", "Learn from your mistakes and keep going.", "Success is a result of hard work and dedication.", "Be the change you wish to see in the world.", "Every setback is an opportunity for a comeback.", "The future belongs to those who believe in their dreams.", "Keep your eyes on the prize and never give up.", "Believe in yourself and others will too.", "Your attitude determines your altitude.", "Stay positive and good things will happen.", "Success is not final, failure is not fatal.", "If you want something, go get it.", "Never give up on something you truly want.", "Believe in your potential and reach for the stars.", "Persistence is the key to success.", "You are capable of achieving great things.", "Stay true to yourself and follow your dreams.", "The only way to do great work is to love what you do.", "Success is not measured by wealth, but by happiness.", "If you can dream it, you can achieve it.", "Don't wait for opportunities, create them."]
+                        random_number = random.randint(0, 29)
+                        new_sms = phrases[random_number] + " " + posting_url
+                        send_sms_message(Configuration.TWILIO_TO_PHONE_NUMBER, new_sms, sms_client)
                         file1.write(f"{counter} {posting_url}\n")
                     except Exception as e:
                         print("Error sending sms")
