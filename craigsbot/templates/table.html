@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sf apt listings</title>
+    <link rel="stylesheet" href="../static/styles.css">
+</head>
+<body>
+    <div class="postings_app">
+        <h1>sf apt listings</h1>
+    </div>
+    <div class="postings_app">
+        <p style="margin-top: 0;">These are apt listings in this <a target="_blank" href="https://www.google.com/maps/d/edit?mid=1IVP_Hpxhk7gg0I7GXPT2_udDjsL7Ug8&usp=sharing">geographic boundary</a></p>
+    </div>
+    <div class="postings_app">
+        {% if prev_page is not none %}
+            <a href="{{ url_for('page', page_number=prev_page) }}"><button><</button></a>
+        {% else %}
+            <button disabled="true"><</button>
+        {% endif %}
+        {% if next_page is not none %}
+            <a href="{{ url_for('page', page_number=next_page) }}"><button>></button></a>
+        {% else %}
+            <button disabled="true">></button>
+        {% endif %}
+    </div>
+    <div class="postings_app">
+        <table class="table">
+            <tr class="table__header">
+                {% for header in headings %}
+                <th class="table__cell">{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in data %}
+            <tr class="table__row">
+                {% for cell in row %}
+                    {% if loop.index == 1 %}
+                        <td class="table__cell"><a href="{{ cell }}" target="_blank">{{ cell }}</a></td>
+                    {% else %}
+                        <td class="table__cell">{{ cell }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

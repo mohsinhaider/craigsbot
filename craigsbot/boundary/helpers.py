@@ -1,16 +1,28 @@
+import os
+
 from shapely.geometry import Polygon, Point
 
 from craigsbot.config import Configuration
 
 
-def create_boundary() -> Polygon:
-    coords = Configuration.COORDINATES.split(";")
-    coord_pairs = []
-    for coord in coords:
-        lat, long = map(lambda c: float(c), coord.split(","))
-        coord_pairs.append((lat, long))
+def create_boundaries() -> list[Polygon]:
+    boundaries = []
+    i = 0
+    # 0 -> Cow Hollow
+    # 1 -> Mission
+    # 2 -> Hayes Valley
+    while True:
+        coord_pairs = []
+        coords = os.environ.get(f"COORDINATES_{i}")
+        if not coords:
+            break
+        for coord in coords.split(";"):
+            lat, long = map(lambda c: float(c), coord.split(","))
+            coord_pairs.append((lat, long,))
+        boundaries.append(Polygon(coord_pairs))
+        i += 1
 
-    return Polygon(coord_pairs)
+    return boundaries
 
 
 def is_coordinate_in_boundary(latitude: float, longitude: float, boundary: Polygon) -> bool:
