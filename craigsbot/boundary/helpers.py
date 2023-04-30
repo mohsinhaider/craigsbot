@@ -8,6 +8,9 @@ from craigsbot.config import Configuration
 def create_boundaries() -> list[Polygon]:
     boundaries = []
     i = 0
+    # 0 -> Cow Hollow
+    # 1 -> Mission
+    # 2 -> Hayes Valley
     while True:
         coord_pairs = []
         coords = os.environ.get(f"COORDINATES_{i}")

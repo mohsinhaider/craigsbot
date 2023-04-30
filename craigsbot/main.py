@@ -105,6 +105,9 @@ def process_postings(driver, sms_client) -> None:
             random_num = random.uniform(0.6, 0.9)
             time.sleep(random_num)
             lat, long = map(lambda c: float(c), CraigslistClient.get_posting_lat_long(driver, posting_url))
+            documents = Posting.objects.filter(latitude=lat, longitude=long)
+            if documents.count() > 0:
+                continue
             found_in_boundary = False
             for boundary in boundaries:
                 if is_coordinate_in_boundary(lat, long, boundary):
