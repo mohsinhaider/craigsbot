@@ -107,6 +107,7 @@ def process_postings(driver, sms_client) -> None:
             lat, long = map(lambda c: float(c), CraigslistClient.get_posting_lat_long(driver, posting_url))
             documents = Posting.objects.filter(latitude=lat, longitude=long)
             if documents.count() > 0:
+                file1.write(f"{counter} Duplicate - already seen\n")
                 continue
             found_in_boundary = False
             for boundary in boundaries:
