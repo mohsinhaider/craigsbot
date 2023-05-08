@@ -100,21 +100,28 @@ def process_postings(driver, sms_client) -> None:
             except DoesNotExist:
                 posting_url = posting_metadata["href"]
                 logger.info(f"Encountered candidate new posting: {posting_url}")
-                count_new_postings += 1
 
             random_num = random.uniform(0.6, 0.9)
             time.sleep(random_num)
             lat, long = map(lambda c: float(c), CraigslistClient.get_posting_lat_long(driver, posting_url))
+            count_new_postings += 1
             documents = Posting.objects.filter(latitude=lat, longitude=long)
-            if documents.count() > 0:
-                file1.write(f"{counter} Duplicate - already seen\n")
-                continue
             found_in_boundary = False
             for boundary in boundaries:
                 if is_coordinate_in_boundary(lat, long, boundary):
                     found_in_boundary = True
                     sms_message = f"Craigsbot found a new apartment: {posting_url}"
                     print(f"Encountered posting inside of boundary {posting_url}")
+                    if documents.count() > 0:
+                        file1.write(f"{counter} Duplicate - already seen\n")
+                        Posting(
+                            data_id=posting_data_id,
+                            url=posting_url,
+                            latitude=lat,
+                            longitude=long,
+                            is_in_boundary=True,
+                        ).save()
+                        break
                     try:
                         print("Sending sms")
                         phrases = ["Life is a journey, enjoy the ride.", "Success is a journey, not a destination.", "Hard work pays off in the end.", "Keep moving forward, one step at a time.", "Life is too short to waste time on negativity.", "Believe in yourself and anything is possible.", "Dream big, work hard, stay focused.", "Failure is not final, it's a stepping stone.", "Your only limit is the one you set for yourself.", "Don't let fear hold you back from success.", "Learn from your mistakes and keep going.", "Success is a result of hard work and dedication.", "Be the change you wish to see in the world.", "Every setback is an opportunity for a comeback.", "The future belongs to those who believe in their dreams.", "Keep your eyes on the prize and never give up.", "Believe in yourself and others will too.", "Your attitude determines your altitude.", "Stay positive and good things will happen.", "Success is not final, failure is not fatal.", "If you want something, go get it.", "Never give up on something you truly want.", "Believe in your potential and reach for the stars.", "Persistence is the key to success.", "You are capable of achieving great things.", "Stay true to yourself and follow your dreams.", "The only way to do great work is to love what you do.", "Success is not measured by wealth, but by happiness.", "If you can dream it, you can achieve it.", "Don't wait for opportunities, create them."]
